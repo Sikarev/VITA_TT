@@ -1,120 +1,62 @@
-function Player() {
-    this.cards = [];
-    this.penaltyPts = 0;
-}
+import Human from "./Human.js";
+import Bot from "./Bot.js"
+import readline from "readline"
 
-let p1 = new Player();
-let p2 = new Player();
-let cardsPerPlayer = 12;
-let yourTurn = true;
+let p1 = new Human();
+let p2 = new Bot();
+let humansTurn = true;
 let botPick, penaltyPoints;
 
-let setCards = (firstPl, secondPl, cardsPerPlayer) => {
-    for (let i = 0; i < cardsPerPlayer; i++) {
-        firstPl.push(i);
-        secondPl.push(i);
-    }
-}
-let showCards = (hand) => {
-    let str = "";
-    for (let i = 0; i < hand.length; i++) {
-        str += `${hand[i]} `;
-    }
-    console.log(str);
-}
-let pickACard = (pick, hand) => {
-    for (let i = 0; i < hand.length; i++) {
-        if (pick == hand[i]) {
-            hand.splice(i, 1);
-            return;
-        }
-    }
-}
-let pickIsCorrect = (pick, hand) => {
-    for (let i = 0; i < hand.length; i++) {
-        if (pick == hand[i]) return true;
-    }
-    return false;
-}
-let pickACardAI = (hand, playersTurn) => {
-    if (!playersTurn) {
-        let maxIndex = 0;
-        let max = hand[maxIndex];
-        for (let i = 1; i < hand.length; i++) {
-            if (max < hand[i]) {
-                max = hand[i];
-                maxIndex = i;
-            }
-        }
-        hand.splice(maxIndex, 1);
-        return max;
-    } else {
-        let minIndex = 0;
-        let min = hand[minIndex];
-        for (let i = 1; i < hand.length; i++) {
-            if (min > hand[i]) {
-                min = hand[i];
-                minIndex = i;
-            }
-        }
-        hand.splice(minIndex, 1);
-        return min;
-    }
-}
-let setPenalty = (attackPts, defendPts) => {
+let calculatePenalty = (attackPts, defendPts) => {
     let penaltyPoints = attackPts - defendPts;
     if (penaltyPoints < 0) penaltyPoints = 0;
     return penaltyPoints;
 }
 
-const { listenerCount } = require("events");
-const readline = require("readline");
 const r1 = readline.createInterface({input: process.stdin, output: process.stdout});
 
-setCards(p1.cards, p2.cards, cardsPerPlayer);
-
 console.log("Ваши карты: ");
-showCards(p1.cards);
+p1.showCards();
 r1.on('line', (input) => {
-    if (pickIsCorrect(input.trim(), p1.cards)) {
+    if (p1.pickIsCorrect(input.trim())) {
     
         //Игрок выбирает карту
-        pickACard(input.trim(), p1.cards);
-        showCards(p1.cards);
+        p1.pickACard(input.trim());
+        p1.showCards();
 
         //Бот выбирает карту
-        botPick = pickACardAI(p2.cards, yourTurn);
+        botPick = p2.pickACard(!humansTurn);
 
-        if (yourTurn) {
+        if (humansTurn) {
             console.log("Ваша атака: " + input.trim());
             console.log("Защита противника: " + botPick);
-            penaltyPoints = setPenalty(parseInt(input.trim()), botPick);
-            p2.penaltyPts += penaltyPoints;
+            penaltyPoints = calculatePenalty(parseInt(input.trim()), botPick);
+            p2.setPenaltyPts(penaltyPoints);
         } else {
             console.log("Ваша защита: " + input.trim());
             console.log("Атака противника: " + botPick);
-            penaltyPoints = setPenalty(botPick, parseInt(input.trim()));
-            p1.penaltyPts += penaltyPoints;
+            penaltyPoints = calculatePenalty(botPick, parseInt(input.trim()));
+            p1.setPenaltyPts(penaltyPoints);
         }
         console.log("Штрафных очков начислено: " + penaltyPoints);
 
-        yourTurn = !yourTurn;
+        humansTurn = !humansTurn;
 
-        if (p1.cards.length == 0) {
+        if (p1.cardsLeft == 0) {
             console.log("У игроков кончились карты");
             console.log("Количество штрафных очков: ");
-            console.log("Вы: " + p1.penaltyPts);
-            console.log("ИИ: " + p2.penaltyPts);
+            console.log("Вы: " + p1.getPenaltyPts());
+            console.log("ИИ: " + p2.getPenaltyPts());
 
-            if (p1.penaltyPts < p2.penaltyPts) console.log("Вы победили!");
-            else if (p1.penaltyPts > p2.penaltyPts) console.log("Вы проиграли");
+            if (p1.getPenaltyPts() < p2.getPenaltyPts()) console.log("Вы победили!");
+            else if (p1.getPenaltyPts() > p2.getPenaltyPts()) console.log("Вы проиграли");
             else console.log("Ничья");
 
             r1.close();
         }
     } else {
         console.log("Такой карты у вас нет. Попробуйте ещё раз");
-        showCards(p1.cards);
+        p1.showCards();
     }
 
 }).on('close', function() {
@@ -140,10 +82,10 @@ r1.on('line', (input) => {
 
 //         //Бот выбирает карту
 //         // showCards(p2.cards);
-//         botPick = pickACardAI(p2.cards, yourTurn);
+//         botPick = pickACardAI(p2.cards, humansTurn);
 //         // showCards(p2.cards);
 
-//         if (yourTurn) {
+//         if (humansTurn) {
 //             console.log("Ваша атака: " + rndPick);
 //             console.log("Защита противника: " + botPick);
 //             penaltyPoints = rndPick - botPick;
@@ -158,7 +100,7 @@ r1.on('line', (input) => {
 //         }
 //         console.log("Штрафных очков начилено: " + penaltyPoints);
 
-//         yourTurn = !yourTurn;
+//         humansTurn = !humansTurn;
 
 //         if (p1.cards.length == 0) {
 //             console.log("У игроков кончились карты");

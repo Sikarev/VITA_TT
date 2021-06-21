@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "testing_task",
   "main": "gameDuel.js",
+  "type": "module",
   "scripts": {
     "start": "node gameDuel.js"
   },
