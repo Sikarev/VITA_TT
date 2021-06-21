@@ -13,6 +13,8 @@ class Human extends Player {
         }
     }
     pickIsCorrect(pick) {
+        // Проверка на то, что правильно выбрал карту (из доступных ему)
+        if (pick == "") return false;
         for (let i = 0; i < this._cards.length; i++) {
             if (pick == this._cards[i]) return true;
         }

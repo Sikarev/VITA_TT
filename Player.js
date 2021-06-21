@@ -1,7 +1,7 @@
 class Player {
     constructor() {
         this._cards = new Array();
-        this._penaltyPts = 0;
+        this._penaltyPts = 0; // Штрафные очки
         this._maxCards = 12;
         this.cardsLeft = 12;
         this.setCards();
@@ -10,6 +10,9 @@ class Player {
         for (let i = 0; i < this._maxCards; i++) {
             this._cards.push(i);
         }
+    }
+    getCards() {
+        return this._cards;
     }
     showCards() {
         let str = "";
