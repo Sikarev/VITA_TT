@@ -1,0 +1,11 @@
+{
+  "name": "vita_test",
+  "version": "1.0.0",
+  "description": "testing_task",
+  "main": "gameDuel.js",
+  "scripts": {
+    "start": "node gameDuel.js"
+  },
+  "author": "Sikarev R.O.",
+  "license": "ISC"
+}
